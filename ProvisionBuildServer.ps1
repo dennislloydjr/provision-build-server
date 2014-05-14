@@ -10,12 +10,18 @@ function Install-Prereqs {
 function Install-Mysql {
 	scoop install mysql --global
 	$MySqlHome = $env:MYSQL_HOME
-	$MySqlData = Join-Path (Get-DataPath) "mysql"
+	$MySqlData = Join-Path ($env:DATA_PATH) "mysql"
 	$MySqlIniFile = Join-Path $MySqlHome "my.ini.2"
 	@"
+[mysqld]
 basedir=$MySqlHome
 datadir=$MySqlData
-	"@ | Out-File -FilePath $MySqlIniFile -Force
+port=3306
+default-storage-engine=InnoDB
+"@ | Out-File -FilePath $MySqlIniFile -Force
+
+	mysqld --install MySQL --defaults-file="$MySqlIniFile"
+	net start MySQL
 }
 
 function Install-Stash {
